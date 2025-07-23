@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="true" scanPeriod="60 seconds" debug="false">
+
+    <springProperty scope="context" name="APPLICATION_NAME" source="spring.application.name"/>
+    <springProperty scope="context" name="PORT" source="server.port"/>
+
+    <property name="LOG_DIR" value="./../logs/"/>
+    <property name="MAX_FILE_SIZE" value="50MB"/>
+    <property name="MAX_HISTORY" value="180"/>
+    <property name="CHARSET" value="utf-8"/>
+    <property name="APP_NAME" value="mpbcz"/>
+
+    <!-- PATTERN CONFIG -->
+    <property name="PATTERN_CONSOLE" value="%cyan(%date{yyyy-MM-dd HH:mm:ss:SSS}) | %X{traceId} | %highlight(%-5level) | %boldYellow(%thread) | %boldGreen(%logger) | %msg%n"/>
+    <property name="PATTERN_MONITOR" value="%logId|%date|%logIp|${APPLICATION_NAME}|${PORT}|%level|%thread|%logger{80}|%file|%method:%line|%msg%n"/>
+    <property name="PATTERN_BUSINESS" value="%date{yyyy-MM-dd HH:mm:ss:SSS}|%X{traceId}|%-5level|%thread|%method:%line|%logger|%msg%n"/>
+
+    <!-- 控制台输出 -->
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <!--格式化输出：%d表示日期，%thread表示线程名，%-5level：级别从左显示5个字符宽度%msg：日志消息，%n是换行符-->
+            <pattern>${PATTERN_CONSOLE}</pattern>
+            <charset>${CHARSET}</charset>
+        </encoder>
+    </appender>
+
+    <!-- 全部日志 appender  -->
+    <appender name="ALL" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_DIR}/${APPLICATION_NAME}/${APPLICATION_NAME}-all.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- 按天回滚 daily -->
+            <fileNamePattern>${LOG_DIR}/${APPLICATION_NAME}/%d{yyyy-MM-dd}/${APPLICATION_NAME}-all-%d{yyyy-MM-dd}-%i.log</fileNamePattern>
+            <!-- 日志最大的历史 180天 -->
+            <maxHistory>${MAX_HISTORY}</maxHistory>
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <!-- MAX_FILE_SIZE:这是活动文件的大小，默认值是10MB，这里设置为50MB -->
+                <maxFileSize>${MAX_FILE_SIZE}</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+        </rollingPolicy>
+        <append>true</append>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <!--格式化输出：%d表示日期，%thread表示线程名，%-5level：级别从左显示5个字符宽度%msg：日志消息，%n是换行符-->
+            <pattern>${PATTERN_BUSINESS}</pattern>
+            <charset>${CHARSET}</charset>
+        </encoder>
+    </appender>
+
+    <!-- 出错日志 appender  -->
+    <appender name="ERROR" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_DIR}/${APPLICATION_NAME}/${APPLICATION_NAME}-error.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- 按天回滚 daily -->
+            <fileNamePattern>${LOG_DIR}/${APPLICATION_NAME}/%d{yyyy-MM-dd}/${APPLICATION_NAME}-error-%d{yyyy-MM-dd}-%i.log</fileNamePattern>
+            <!-- 日志最大的历史 180天 -->
+            <maxHistory>${MAX_HISTORY}</maxHistory>
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <!-- MAX_FILE_SIZE:这是活动文件的大小，默认值是10MB，这里设置为50MB -->
+                <maxFileSize>${MAX_FILE_SIZE}</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+        </rollingPolicy>
+        <append>true</append>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <!--格式化输出：%d表示日期，%thread表示线程名，%-5level：级别从左显示5个字符宽度%msg：日志消息，%n是换行符-->
+            <pattern>${PATTERN_BUSINESS}</pattern>
+            <charset>${CHARSET}</charset>
+        </encoder>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <!-- 只打印错误日志 -->
+            <level>ERROR</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+    </appender>
+
+    <appender name="TRACE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <!-- 记录的日志文件的路径及文件名 -->
+        <file>${LOG_DIR}/${APPLICATION_NAME}/monitorLog/${APPLICATION_NAME}.log</file>
+        <!-- 日志记录器的滚动策略，按日期，按大小记录 -->
+        <!--TimeBasedRollingPolicy 实现的是基于时间的分包策略，分包间隔是根据fileNamePattern中指定的事件最小单位-->
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- 归档的日志文件的路径，例如今天是2018-12-19日志，当前写的日志文件路径为file节点指定，可以将此文件与file指定文件路径设置为不同路径，从而将当前日志文件或归档日志文件置不同的目录。
+            			而2018-12-01的日志文件在由fileNamePattern指定。%d{yyyy-MM-dd}指定日期格式，%i指定索引 -->
+            <fileNamePattern>${LOG_DIR}/${APPLICATION_NAME}/monitorLog/%d{yyyy-MM-dd}/${APPLICATION_NAME}-%d{yyyyMMdd}.%i.log</fileNamePattern>
+            <!-- 除按日志记录之外，还配置了日志文件不能超过50Mb，若超过50Mb，日志文件会以索引0开始，  命名日志文件，例如app_test-20181219.0.log -->
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <!--最大50mb-->
+                <maxFileSize>${MAX_FILE_SIZE}</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+        </rollingPolicy>
+        <!-- 追加方式记录日志 -->
+        <append>true</append>
+        <!-- 日志文件的格式和编码 -->
+        <encoder class="com.dap.flow.logback.FlowPatternLayoutEncoder">
+            <!--格式化输出：%d表示日期，%thread表示线程名，%-5level：级别从左显示5个字符宽度%msg：日志消息，%n是换行符-->
+            <pattern>${PATTERN_MONITOR}</pattern>
+            <charset>${CHARSET}</charset>
+        </encoder>
+        <!--此日志文件只记录info级别的-->
+        <!--filter是日志过滤器-->
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <!--过滤级别-->
+            <level>INFO</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+    </appender>
+
+    <!--DAP PaaS全部日志文件输出 -->
+    <logger name="com.dap" additivity="false" level="DEBUG">
+        <appender-ref ref="ALL"/>
+        <appender-ref ref="STDOUT"/>
+    </logger>
+
+    <!-- 业务全部日志文件输出 -->
+    <logger name="com.gientech" additivity="false" level="DEBUG">
+        <appender-ref ref="ALL"/>
+        <appender-ref ref="STDOUT"/>
+    </logger>
+
+    <!-- 错误日志文件输出 -->
+    <root level="ERROR" additivity="false">
+        <appender-ref ref="ERROR"/>
+        <appender-ref ref="STDOUT"/>
+    </root>
+
+</configuration>

@@ -1,0 +1,48 @@
+server:
+    port: 8008
+spring:
+    profiles:
+        active: define
+    jackson:
+        date-format: yyyy-MM-dd HH:mm:ss
+        time-zone: GMT+8
+
+logging:
+        config: classpath:logback-dap.xml
+
+# mybatis_config(业务级)
+dap:
+    datasource:
+        url: @ebmp.mpbcz.business.datasource.url@?useUnicode=true&characterEncoding=UTF-8&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=Hongkong&useSSL=false&allowMultiQueries=true
+        username: @ebmp.mpbcz.business.datasource.username@
+        password: @ebmp.mpbcz.business.datasource.password@
+        driverClassName: @ebmp.mpbcz.business.datasource.driverClassName@
+    mybatis:
+        mapperLocations: classpath*:mybatis/mapper/*.xml
+        configLocation: classpath:mybatis/mybatis-config.xml
+    flow:
+# 将平台系统发布获取的唯一标识填写在此处
+        register.key: H4sIAAAAAAAAAEWNwQrCMBBE/2XPElqtEnL3bKn9gTVZpZhmy6ZWSum/uxbB28x7MLPAIDx1gQTc8s0je47goL5cW9gBhiCUs4KyMKfKlHtzPDhrK6uS0tTOA6kstN0Fe3qzPH+sOW8LkTHcMGLyG8QUuG9ekVQJPbo8ylz/bxN6zrCuH4z5gYiYAAAA
+# 平台响应信息配置
+        response:
+            successCode: "00000000"
+            successMsg: 交易成功
+            removeEmptyBody: true
+# 平台事务相关配置
+        tx:
+            persistence: false
+            bindType: service
+# 启动工程校验模式
+        check:
+            mode: false
+        jar:
+            version: @flow.version@
+# 平台线程池相关配置
+        parse:
+            load:
+                corePoolSize: @flow.parse.load.corePoolSize@
+                keepAliveTime: @flow.parse.load.keepAliveTime@
+                blockingQueueSize: @flow.parse.load.blockingQueueSize@
+
+
+
