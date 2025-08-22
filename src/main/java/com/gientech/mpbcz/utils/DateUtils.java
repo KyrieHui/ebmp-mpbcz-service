@@ -7,6 +7,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.LocalDateTime;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -18,6 +19,9 @@ import java.util.Date;
  * Date: 2023/3/11 10:48
  */
 public class DateUtils {
+    public static LocalDateTime parse(String dateStr) {
+        return LocalDateTime.parse(dateStr);
+    }
 
     public static Date  nextYearDate(Date date){
         Calendar cal = Calendar.getInstance();
